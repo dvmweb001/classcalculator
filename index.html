@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Payment Calculator</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            margin: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        input, select {
+            padding: 5px;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            calculateTotal(); // Initialize totals on page load
+        };
+
+        function addClassRow() {
+            const table = document.getElementById("classTable");
+            const row = table.insertRow(-1);
+            row.innerHTML = `
+                <td><input type="date" required></td>
+                <td><input type="time" required></td> <!-- Time In field -->
+                <td>
+                    <select onchange="calculateTotal()">
+                        <option value="165">25 min - ₱165</option>
+                        <option value="330">50 min - ₱330</option>
+                    </select>
+                </td>
+                <td><button type="button" onclick="removeRow(this)">❌</button></td>
+            `;
+        }
+
+        function removeRow(button) {
+            const row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let totalClasses = 0, totalPayment = 0;
+            const rows = document.querySelectorAll("#classTable tr");
+            rows.forEach(row => {
+                const select = row.querySelector("select");
+                if (select) {
+                    totalClasses++;
+                    totalPayment += parseInt(select.value);
+                }
+            });
+
+            document.getElementById("totalClasses").innerText = totalClasses;
+            document.getElementById("totalPayment").innerText = totalPayment;
+        }
+
+        function submitData() {
+            const studentName = document.getElementById("studentName").value.trim();
+            if (!studentName) {
+                alert("Please enter the student's name.");
+                return;
+            }
+
+            const classData = [];
+            let isValid = true;
+
+            document.querySelectorAll("#classTable tr").forEach(row => {
+                const date = row.querySelector("input[type='date']")?.value;
+                const timeIn = row.querySelector("input[type='time']")?.value;
+                const duration = row.querySelector("select")?.value;
+                if (!date || !timeIn || !duration) {
+                    isValid = false;
+                } else {
+                    classData.push({ date, timeIn, duration });
+                }
+            });
+
+            if (classData.length === 0) {
+                alert("Please add at least one class.");
+                return;
+            }
+
+            if (!isValid) {
+                alert("Please ensure all classes have a valid date, time, and duration.");
+                return;
+            }
+
+            const totalPayment = document.getElementById("totalPayment").innerText;
+            localStorage.setItem("studentData", JSON.stringify({ studentName, classData, totalPayment }));
+            window.location.href = "results.html";
+        }
+    </script>
+</head>
+<body>
+    <h2>Class Payment Calculator</h2>
+    <label>Student Name: <input type="text" id="studentName" required></label>
+    <table id="classTable">
+        <tr>
+            <th>Date</th>
+            <th>Time In</th>
+            <th>Duration</th>
+            <th>Action</th>
+        </tr>
+    </table>
+    <button type="button" onclick="addClassRow()">➕ Add Class</button>
+    <p>Total Classes: <span id="totalClasses">0</span></p>
+    <p>Total Payment: ₱<span id="totalPayment">0</span></p>
+    <button onclick="submitData()">Submit</button>
+</body>
+</html>
