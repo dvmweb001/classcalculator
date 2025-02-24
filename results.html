@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+</head>
+<body>
+    <h2>Class Payment Details</h2>
+    <div id="results"></div>
+    <script>
+        const studentData = JSON.parse(localStorage.getItem("studentData"));
+        if (studentData) {
+            document.getElementById("results").innerHTML = `
+                <p>Student Name: ${studentData.studentName}</p>
+                <p>Total Classes: ${studentData.classData.length}</p>
+                <p>Total Payment: ₱${studentData.totalPayment}</p>
+                <h3>Class Details:</h3>
+                <ul>
+                    ${studentData.classData.map(cls => `<li>Date: ${cls.date}, Time In: ${cls.timeIn}, Duration: ₱${cls.duration}</li>`).join("")}
+                </ul>
+            `;
+        } else {
+            document.getElementById("results").innerHTML = "<p>No data found.</p>";
+        }
+    </script>
+</body>
+</html>
